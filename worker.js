@@ -14,7 +14,7 @@ export default {
 
     try {
       // =========================
-      // HEALTH CHECK
+      // HEALTH
       // =========================
       if (url.pathname === "/api/health") {
         return json({
@@ -22,6 +22,133 @@ export default {
           app: "PayP2P",
           backend: "online",
           database: !!env.DB,
+          telegram_auth: !!env.BOT_TOKEN,
+        }, corsHeaders);
+      }
+
+      // =========================
+      // TELEGRAM AUTH
+      // =========================
+      if (
+        url.pathname === "/api/auth/telegram" &&
+        request.method === "POST"
+      ) {
+        if (!env.BOT_TOKEN) {
+          return json({
+            success: false,
+            error: "BOT_TOKEN is not configured",
+          }, corsHeaders, 500);
+        }
+
+        const body = await request.json();
+        const initData = body.initData;
+
+        if (!initData) {
+          return json({
+            success: false,
+            error: "Telegram initData is required",
+          }, corsHeaders, 400);
+        }
+
+        const telegramData = await validateTelegramInitData(
+          initData,
+          env.BOT_TOKEN
+        );
+
+        if (!telegramData.valid) {
+          return json({
+            success: false,
+            error: "Invalid Telegram authentication",
+          }, corsHeaders, 401);
+        }
+
+        const user = telegramData.user;
+
+        if (!user || !user.id) {
+          return json({
+            success: false,
+            error: "Telegram user data not found",
+          }, corsHeaders, 401);
+        }
+
+        // Create/update user
+        await env.DB
+          .prepare(`
+            INSERT INTO users (
+              telegram_id,
+              username,
+              first_name,
+              last_name,
+              photo_url
+            )
+            VALUES (?, ?, ?, ?, ?)
+            ON CONFLICT(telegram_id)
+            DO UPDATE SET
+              username = excluded.username,
+              first_name = excluded.first_name,
+              last_name = excluded.last_name,
+              photo_url = excluded.photo_url,
+              updated_at = CURRENT_TIMESTAMP
+          `)
+          .bind(
+            String(user.id),
+            user.username || null,
+            user.first_name || null,
+            user.last_name || null,
+            user.photo_url || null
+          )
+          .run();
+
+        const dbUser = await env.DB
+          .prepare(`
+            SELECT
+              id,
+              telegram_id,
+              username,
+              first_name,
+              last_name,
+              photo_url,
+              status,
+              created_at
+            FROM users
+            WHERE telegram_id = ?
+          `)
+          .bind(String(user.id))
+          .first();
+
+        if (!dbUser) {
+          throw new Error("Unable to create user");
+        }
+
+        // Create wallet automatically
+        await env.DB
+          .prepare(`
+            INSERT OR IGNORE INTO wallets (user_id)
+            VALUES (?)
+          `)
+          .bind(dbUser.id)
+          .run();
+
+        const wallet = await env.DB
+          .prepare(`
+            SELECT
+              balance,
+              pending_balance,
+              updated_at
+            FROM wallets
+            WHERE user_id = ?
+          `)
+          .bind(dbUser.id)
+          .first();
+
+        return json({
+          success: true,
+          authenticated: true,
+          user: dbUser,
+          wallet: wallet || {
+            balance: 0,
+            pending_balance: 0,
+          },
         }, corsHeaders);
       }
 
@@ -43,7 +170,10 @@ export default {
       // =========================
       // GET OFFERS
       // =========================
-      if (url.pathname === "/api/offers" && request.method === "GET") {
+      if (
+        url.pathname === "/api/offers" &&
+        request.method === "GET"
+      ) {
         const result = await env.DB
           .prepare(`
             SELECT
@@ -146,7 +276,7 @@ export default {
       }
 
       // =========================
-      // CREATE / GET USER
+      // CREATE / UPDATE USER
       // =========================
       if (
         url.pathname === "/api/user" &&
@@ -197,7 +327,6 @@ export default {
           .bind(String(body.telegram_id))
           .first();
 
-        // Create wallet automatically
         await env.DB
           .prepare(`
             INSERT OR IGNORE INTO wallets (user_id)
@@ -441,6 +570,151 @@ export default {
     }
   },
 };
+
+
+// ============================================
+// TELEGRAM MINI APP INITDATA VALIDATION
+// ============================================
+
+async function validateTelegramInitData(initData, botToken) {
+  try {
+    const params = new URLSearchParams(initData);
+
+    const receivedHash = params.get("hash");
+
+    if (!receivedHash) {
+      return {
+        valid: false,
+        reason: "Missing hash",
+      };
+    }
+
+    params.delete("hash");
+
+    const dataCheckString = [...params.entries()]
+      .sort(([a], [b]) => a.localeCompare(b))
+      .map(([key, value]) => `${key}=${value}`)
+      .join("\n");
+
+    // Secret key:
+    // HMAC-SHA256(bot_token, "WebAppData")
+    const secretKey = await crypto.subtle.importKey(
+      "raw",
+      new TextEncoder().encode("WebAppData"),
+      {
+        name: "HMAC",
+        hash: "SHA-256",
+      },
+      false,
+      ["sign"]
+    );
+
+    const secretKeyBytes = await crypto.subtle.sign(
+      "HMAC",
+      secretKey,
+      new TextEncoder().encode(botToken)
+    );
+
+    // Data hash
+    const dataKey = await crypto.subtle.importKey(
+      "raw",
+      secretKeyBytes,
+      {
+        name: "HMAC",
+        hash: "SHA-256",
+      },
+      false,
+      ["sign"]
+    );
+
+    const calculatedHashBytes = await crypto.subtle.sign(
+      "HMAC",
+      dataKey,
+      new TextEncoder().encode(dataCheckString)
+    );
+
+    const calculatedHash = [...new Uint8Array(calculatedHashBytes)]
+      .map(byte => byte.toString(16).padStart(2, "0"))
+      .join("");
+
+    if (!timingSafeEqual(calculatedHash, receivedHash)) {
+      return {
+        valid: false,
+        reason: "Invalid hash",
+      };
+    }
+
+    // Check auth_date
+    const authDate = Number(params.get("auth_date"));
+
+    if (!authDate) {
+      return {
+        valid: false,
+        reason: "Missing auth_date",
+      };
+    }
+
+    const now = Math.floor(Date.now() / 1000);
+
+    // Reject data older than 24 hours
+    if (now - authDate > 86400) {
+      return {
+        valid: false,
+        reason: "Telegram authentication data expired",
+      };
+    }
+
+    const userString = params.get("user");
+
+    if (!userString) {
+      return {
+        valid: false,
+        reason: "Missing Telegram user",
+      };
+    }
+
+    const user = JSON.parse(userString);
+
+    return {
+      valid: true,
+      user,
+    };
+
+  } catch (error) {
+    return {
+      valid: false,
+      reason: error.message,
+    };
+  }
+}
+
+
+// ============================================
+// CONSTANT-TIME STRING COMPARISON
+// ============================================
+
+function timingSafeEqual(a, b) {
+  if (typeof a !== "string" || typeof b !== "string") {
+    return false;
+  }
+
+  if (a.length !== b.length) {
+    return false;
+  }
+
+  let result = 0;
+
+  for (let i = 0; i < a.length; i++) {
+    result |= a.charCodeAt(i) ^ b.charCodeAt(i);
+  }
+
+  return result === 0;
+}
+
+
+// ============================================
+// JSON RESPONSE
+// ============================================
 
 function json(data, corsHeaders = {}, status = 200) {
   return new Response(JSON.stringify(data), {
