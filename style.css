@@ -1,0 +1,109 @@
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: Arial, sans-serif;
+  background: #f5f7fb;
+  color: #111827;
+}
+
+.app {
+  max-width: 480px;
+  margin: auto;
+  min-height: 100vh;
+  background: #ffffff;
+}
+
+header {
+  padding: 22px 20px;
+  background: #111827;
+  color: white;
+}
+
+.logo {
+  font-size: 24px;
+  font-weight: 700;
+}
+
+.subtitle {
+  margin-top: 6px;
+  font-size: 14px;
+  opacity: 0.75;
+}
+
+main {
+  padding: 20px;
+}
+
+.balance {
+  background: #f3f4f6;
+  border-radius: 16px;
+  padding: 20px;
+  margin-bottom: 20px;
+}
+
+.balance-title {
+  font-size: 13px;
+  color: #6b7280;
+}
+
+.balance-amount {
+  margin-top: 8px;
+  font-size: 28px;
+  font-weight: 700;
+}
+
+.actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-bottom: 25px;
+}
+
+.btn {
+  border: none;
+  border-radius: 12px;
+  padding: 15px;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.buy {
+  background: #111827;
+  color: white;
+}
+
+.sell {
+  background: #e5e7eb;
+  color: #111827;
+}
+
+.section-title {
+  font-size: 18px;
+  font-weight: 700;
+  margin-bottom: 12px;
+}
+
+.menu {
+  display: grid;
+  gap: 10px;
+}
+
+.menu-item {
+  padding: 16px;
+  background: #f9fafb;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  font-weight: 600;
+}
+
+footer {
+  padding: 20px;
+  text-align: center;
+  font-size: 12px;
+  color: #9ca3af;
+}
