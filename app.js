@@ -1,14 +1,24 @@
-document.addEventListener("DOMContentLoaded", () => {
+const buyTab = document.getElementById("buyTab");
+const sellTab = document.getElementById("sellTab");
+const tradeBtn = document.getElementById("tradeBtn");
+const notificationBtn = document.getElementById("notificationBtn");
 
-  const buyButton = document.querySelector(".buy");
-  const sellButton = document.querySelector(".sell");
+buyTab.addEventListener("click", () => {
+  buyTab.classList.add("active");
+  sellTab.classList.remove("active");
+  tradeBtn.textContent = "Buy USDT";
+});
 
-  buyButton.addEventListener("click", () => {
-    alert("Buy USDT feature coming soon.");
-  });
+sellTab.addEventListener("click", () => {
+  sellTab.classList.add("active");
+  buyTab.classList.remove("active");
+  tradeBtn.textContent = "Sell USDT";
+});
 
-  sellButton.addEventListener("click", () => {
-    alert("Sell USDT feature coming soon.");
-  });
+tradeBtn.addEventListener("click", () => {
+  alert("P2P trading will be available soon.");
+});
 
+notificationBtn.addEventListener("click", () => {
+  alert("No new notifications.");
 });
