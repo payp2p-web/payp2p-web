@@ -2,7 +2,6 @@ export default {
   async fetch(request, env) {
     const url = new URL(request.url);
 
-    // CORS
     const corsHeaders = {
       "Access-Control-Allow-Origin": "*",
       "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS",
@@ -13,38 +12,439 @@ export default {
       return new Response(null, { headers: corsHeaders });
     }
 
-    // API health check
-    if (url.pathname === "/api/health") {
+    try {
+      // =========================
+      // HEALTH CHECK
+      // =========================
+      if (url.pathname === "/api/health") {
+        return json({
+          success: true,
+          app: "PayP2P",
+          backend: "online",
+          database: !!env.DB,
+        }, corsHeaders);
+      }
+
+      // =========================
+      // DATABASE TEST
+      // =========================
+      if (url.pathname === "/api/db-test") {
+        const result = await env.DB
+          .prepare("SELECT COUNT(*) AS count FROM users")
+          .first();
+
+        return json({
+          success: true,
+          database: "connected",
+          users: result?.count || 0,
+        }, corsHeaders);
+      }
+
+      // =========================
+      // GET OFFERS
+      // =========================
+      if (url.pathname === "/api/offers" && request.method === "GET") {
+        const result = await env.DB
+          .prepare(`
+            SELECT
+              id,
+              type,
+              title,
+              payment_method,
+              price,
+              min_amount,
+              max_amount,
+              available_amount,
+              terms,
+              status,
+              created_at
+            FROM offers
+            WHERE status = 'active'
+            ORDER BY id DESC
+          `)
+          .all();
+
+        return json({
+          success: true,
+          offers: result.results || [],
+        }, corsHeaders);
+      }
+
+      // =========================
+      // GET DEPOSIT METHODS
+      // =========================
+      if (
+        url.pathname === "/api/deposit-methods" &&
+        request.method === "GET"
+      ) {
+        const result = await env.DB
+          .prepare(`
+            SELECT
+              id,
+              name,
+              type,
+              account_number,
+              wallet_address,
+              network,
+              instructions
+            FROM deposit_methods
+            WHERE is_active = 1
+            ORDER BY id DESC
+          `)
+          .all();
+
+        return json({
+          success: true,
+          methods: result.results || [],
+        }, corsHeaders);
+      }
+
+      // =========================
+      // GET USER
+      // =========================
+      if (
+        url.pathname === "/api/user" &&
+        request.method === "GET"
+      ) {
+        const telegramId = url.searchParams.get("telegram_id");
+
+        if (!telegramId) {
+          return json({
+            success: false,
+            error: "telegram_id is required",
+          }, corsHeaders, 400);
+        }
+
+        const user = await env.DB
+          .prepare(`
+            SELECT
+              id,
+              telegram_id,
+              username,
+              first_name,
+              last_name,
+              photo_url,
+              status,
+              created_at
+            FROM users
+            WHERE telegram_id = ?
+          `)
+          .bind(telegramId)
+          .first();
+
+        if (!user) {
+          return json({
+            success: false,
+            error: "User not found",
+          }, corsHeaders, 404);
+        }
+
+        return json({
+          success: true,
+          user,
+        }, corsHeaders);
+      }
+
+      // =========================
+      // CREATE / GET USER
+      // =========================
+      if (
+        url.pathname === "/api/user" &&
+        request.method === "POST"
+      ) {
+        const body = await request.json();
+
+        if (!body.telegram_id) {
+          return json({
+            success: false,
+            error: "telegram_id is required",
+          }, corsHeaders, 400);
+        }
+
+        await env.DB
+          .prepare(`
+            INSERT INTO users (
+              telegram_id,
+              username,
+              first_name,
+              last_name,
+              photo_url
+            )
+            VALUES (?, ?, ?, ?, ?)
+            ON CONFLICT(telegram_id)
+            DO UPDATE SET
+              username = excluded.username,
+              first_name = excluded.first_name,
+              last_name = excluded.last_name,
+              photo_url = excluded.photo_url,
+              updated_at = CURRENT_TIMESTAMP
+          `)
+          .bind(
+            String(body.telegram_id),
+            body.username || null,
+            body.first_name || null,
+            body.last_name || null,
+            body.photo_url || null
+          )
+          .run();
+
+        const user = await env.DB
+          .prepare(`
+            SELECT *
+            FROM users
+            WHERE telegram_id = ?
+          `)
+          .bind(String(body.telegram_id))
+          .first();
+
+        // Create wallet automatically
+        await env.DB
+          .prepare(`
+            INSERT OR IGNORE INTO wallets (user_id)
+            VALUES (?)
+          `)
+          .bind(user.id)
+          .run();
+
+        return json({
+          success: true,
+          user,
+        }, corsHeaders);
+      }
+
+      // =========================
+      // GET WALLET
+      // =========================
+      if (
+        url.pathname === "/api/wallet" &&
+        request.method === "GET"
+      ) {
+        const telegramId = url.searchParams.get("telegram_id");
+
+        if (!telegramId) {
+          return json({
+            success: false,
+            error: "telegram_id is required",
+          }, corsHeaders, 400);
+        }
+
+        const wallet = await env.DB
+          .prepare(`
+            SELECT
+              w.user_id,
+              w.balance,
+              w.pending_balance,
+              w.updated_at
+            FROM wallets w
+            INNER JOIN users u ON u.id = w.user_id
+            WHERE u.telegram_id = ?
+          `)
+          .bind(telegramId)
+          .first();
+
+        if (!wallet) {
+          return json({
+            success: false,
+            error: "Wallet not found",
+          }, corsHeaders, 404);
+        }
+
+        return json({
+          success: true,
+          wallet,
+        }, corsHeaders);
+      }
+
+      // =========================
+      // GET ORDERS
+      // =========================
+      if (
+        url.pathname === "/api/orders" &&
+        request.method === "GET"
+      ) {
+        const telegramId = url.searchParams.get("telegram_id");
+
+        if (!telegramId) {
+          return json({
+            success: false,
+            error: "telegram_id is required",
+          }, corsHeaders, 400);
+        }
+
+        const result = await env.DB
+          .prepare(`
+            SELECT
+              o.id,
+              o.type,
+              o.amount,
+              o.price,
+              o.total,
+              o.payment_method,
+              o.status,
+              o.created_at,
+              o.updated_at
+            FROM orders o
+            INNER JOIN users u ON u.id = o.user_id
+            WHERE u.telegram_id = ?
+            ORDER BY o.id DESC
+          `)
+          .bind(telegramId)
+          .all();
+
+        return json({
+          success: true,
+          orders: result.results || [],
+        }, corsHeaders);
+      }
+
+      // =========================
+      // CREATE ORDER
+      // =========================
+      if (
+        url.pathname === "/api/orders" &&
+        request.method === "POST"
+      ) {
+        const body = await request.json();
+
+        if (!body.telegram_id) {
+          return json({
+            success: false,
+            error: "telegram_id is required",
+          }, corsHeaders, 400);
+        }
+
+        if (!body.type || !body.amount || !body.price) {
+          return json({
+            success: false,
+            error: "type, amount and price are required",
+          }, corsHeaders, 400);
+        }
+
+        const user = await env.DB
+          .prepare(`
+            SELECT id
+            FROM users
+            WHERE telegram_id = ?
+          `)
+          .bind(String(body.telegram_id))
+          .first();
+
+        if (!user) {
+          return json({
+            success: false,
+            error: "User not found",
+          }, corsHeaders, 404);
+        }
+
+        const amount = Number(body.amount);
+        const price = Number(body.price);
+        const total = amount * price;
+
+        const result = await env.DB
+          .prepare(`
+            INSERT INTO orders (
+              user_id,
+              offer_id,
+              type,
+              amount,
+              price,
+              total,
+              payment_method,
+              status
+            )
+            VALUES (?, ?, ?, ?, ?, ?, ?, 'pending')
+          `)
+          .bind(
+            user.id,
+            body.offer_id || null,
+            body.type,
+            amount,
+            price,
+            total,
+            body.payment_method || null
+          )
+          .run();
+
+        return json({
+          success: true,
+          order_id: result.meta.last_row_id,
+          status: "pending",
+        }, corsHeaders);
+      }
+
+      // =========================
+      // GET NOTIFICATIONS
+      // =========================
+      if (
+        url.pathname === "/api/notifications" &&
+        request.method === "GET"
+      ) {
+        const telegramId = url.searchParams.get("telegram_id");
+
+        if (!telegramId) {
+          return json({
+            success: false,
+            error: "telegram_id is required",
+          }, corsHeaders, 400);
+        }
+
+        const result = await env.DB
+          .prepare(`
+            SELECT
+              n.id,
+              n.title,
+              n.message,
+              n.is_read,
+              n.created_at
+            FROM notifications n
+            INNER JOIN users u ON u.id = n.user_id
+            WHERE u.telegram_id = ?
+            ORDER BY n.id DESC
+            LIMIT 100
+          `)
+          .bind(telegramId)
+          .all();
+
+        return json({
+          success: true,
+          notifications: result.results || [],
+        }, corsHeaders);
+      }
+
+      // =========================
+      // API NOT FOUND
+      // =========================
+      if (url.pathname.startsWith("/api/")) {
+        return json({
+          success: false,
+          error: "API endpoint not found",
+        }, corsHeaders, 404);
+      }
+
+      // =========================
+      // FRONTEND
+      // =========================
+      if (env.ASSETS) {
+        return env.ASSETS.fetch(request);
+      }
+
+      return new Response("PayP2P is running", {
+        headers: corsHeaders,
+      });
+
+    } catch (error) {
       return json({
-        success: true,
-        app: "PayP2P",
-        backend: "online",
-        database: !!env.DB,
-      }, corsHeaders);
+        success: false,
+        error: "Internal server error",
+        message: error.message,
+      }, corsHeaders, 500);
     }
-
-    // Basic API route
-    if (url.pathname.startsWith("/api/")) {
-      return json({
-        success: true,
-        message: "PayP2P API is working",
-      }, corsHeaders);
-    }
-
-    // Serve frontend through Cloudflare Static Assets
-    if (env.ASSETS) {
-      return env.ASSETS.fetch(request);
-    }
-
-    return new Response("PayP2P is running", {
-      headers: corsHeaders,
-    });
   },
 };
 
-function json(data, corsHeaders = {}) {
+function json(data, corsHeaders = {}, status = 200) {
   return new Response(JSON.stringify(data), {
-    status: 200,
+    status,
     headers: {
       "Content-Type": "application/json",
       ...corsHeaders,
