@@ -6,61 +6,87 @@
   <meta name="theme-color" content="#0b1220">
 
   <title>PayP2P</title>
-  <meta name="description" content="PayP2P - Secure P2P marketplace">
 
   <link rel="stylesheet" href="style.css">
 </head>
 
 <body>
 
-  <div class="app">
+<div class="app">
 
-    <!-- Header -->
-    <header class="topbar">
-      <div>
-        <div class="brand">PayP2P</div>
-        <div class="online">
-          <span></span> P2P Marketplace
-        </div>
+  <!-- Header -->
+  <header class="topbar">
+    <div>
+      <div class="brand">PayP2P</div>
+      <div class="status">
+        <span></span> P2P Marketplace
       </div>
+    </div>
 
-      <button class="icon-btn" id="notificationBtn" type="button">
-        🔔
-      </button>
-    </header>
+    <button class="icon-btn" id="notifyBtn">🔔</button>
+  </header>
 
-    <main>
 
-      <!-- Balance -->
-      <section class="balance-card">
-        <div class="balance-label">Available Balance</div>
+  <!-- Pages -->
+
+  <main id="appContent">
+
+    <!-- HOME -->
+
+    <section id="homePage" class="page active">
+
+      <div class="balance-card">
+
+        <div class="balance-label">
+          Available Balance
+        </div>
 
         <div class="balance-row">
+
           <div>
-            <div class="balance-amount">0.00</div>
-            <div class="balance-currency">USDT</div>
+            <div class="balance">
+              0.00
+            </div>
+
+            <div class="currency">
+              USDT
+            </div>
           </div>
 
-          <button class="wallet-btn" type="button">
+          <button class="wallet-btn">
             Wallet
           </button>
+
         </div>
-      </section>
+
+      </div>
+
 
       <!-- Buy / Sell -->
-      <section class="trade-card">
+
+      <div class="trade-card">
 
         <div class="trade-tabs">
-          <button class="trade-tab active" id="buyTab" type="button">
+
+          <button
+            class="trade-tab active"
+            id="buyTab"
+          >
             Buy
           </button>
 
-          <button class="trade-tab" id="sellTab" type="button">
+          <button
+            class="trade-tab"
+            id="sellTab"
+          >
             Sell
           </button>
+
         </div>
 
+
         <div class="trade-info">
+
           <div>
             <span>Asset</span>
             <strong>USDT</strong>
@@ -70,110 +96,385 @@
             <span>Payment</span>
             <strong>BDT ৳</strong>
           </div>
+
         </div>
 
-        <button class="primary-btn" id="tradeBtn" type="button">
+
+        <button
+          class="primary-btn"
+          id="tradeBtn"
+        >
           Buy USDT
         </button>
 
-      </section>
+      </div>
 
-      <!-- Market -->
-      <section class="market-section">
 
-        <div class="section-header">
-          <div>
-            <h2>Available Offers</h2>
-            <p>Live P2P advertisements</p>
-          </div>
+      <!-- Offers -->
 
-          <button class="filter-btn" type="button">
-            Filter
-          </button>
+      <div class="section-head">
+
+        <div>
+          <h2>Available Offers</h2>
+
+          <p>
+            P2P advertisements
+          </p>
         </div>
 
-        <!-- Offer -->
+        <button class="filter-btn">
+          Filter
+        </button>
+
+      </div>
+
+
+      <div id="offers">
+
         <div class="offer-card">
 
-          <div class="merchant-row">
+          <div class="merchant">
 
-            <div class="avatar">P</div>
+            <div class="avatar">
+              P
+            </div>
 
-            <div class="merchant-info">
-              <strong>PayP2P Merchant</strong>
+            <div>
+
+              <strong>
+                PayP2P Merchant
+              </strong>
 
               <div class="merchant-meta">
-                <span class="verified">✓ Verified</span>
-                <span>100% completion</span>
+
+                <span class="verified">
+                  ✓ Verified
+                </span>
+
+                <span>
+                  100% completion
+                </span>
+
               </div>
+
             </div>
 
           </div>
 
-          <div class="offer-details">
+
+          <div class="offer-info">
 
             <div>
+
               <span>Price</span>
-              <strong>৳ 0.00</strong>
+
+              <strong>
+                ৳ 0.00
+              </strong>
+
             </div>
 
             <div>
+
               <span>Available</span>
-              <strong>0 USDT</strong>
+
+              <strong>
+                0 USDT
+              </strong>
+
             </div>
 
           </div>
+
 
           <div class="payment-tags">
+
             <span>bKash</span>
             <span>Nagad</span>
+
           </div>
 
-          <button class="offer-btn" type="button">
+
+          <button class="offer-btn">
             Buy USDT
           </button>
 
         </div>
 
-        <!-- Empty state -->
-        <div class="empty-card">
-          <div class="empty-icon">↔</div>
-          <strong>No other offers yet</strong>
-          <p>New P2P offers will appear here.</p>
+      </div>
+
+
+      <div class="empty">
+
+        <div class="empty-icon">
+          ⇄
         </div>
 
-      </section>
+        <strong>
+          No other offers yet
+        </strong>
 
-    </main>
+        <p>
+          New P2P offers will appear here.
+        </p>
 
-    <!-- Bottom Navigation -->
-    <nav class="bottom-nav">
+      </div>
 
-      <button class="nav-item active" type="button">
-        <span>⌂</span>
-        <small>Home</small>
+    </section>
+
+
+
+    <!-- TRADE PAGE -->
+
+    <section id="tradePage" class="page">
+
+      <button class="back-btn" id="backHome">
+        ← Back
       </button>
 
-      <button class="nav-item" type="button">
-        <span>⇄</span>
-        <small>Trade</small>
+      <h1 id="tradeTitle">
+        Buy USDT
+      </h1>
+
+      <p class="subtitle">
+        Create a P2P order
+      </p>
+
+
+      <div class="input-card">
+
+        <label>
+          USDT Amount
+        </label>
+
+        <div class="amount-box">
+
+          <input
+            type="number"
+            id="amountInput"
+            placeholder="0.00"
+          >
+
+          <span>
+            USDT
+          </span>
+
+        </div>
+
+      </div>
+
+
+      <div class="input-card">
+
+        <label>
+          Payment Method
+        </label>
+
+        <select id="paymentMethod">
+
+          <option value="">
+            Select payment method
+          </option>
+
+          <option value="bKash">
+            bKash
+          </option>
+
+          <option value="Nagad">
+            Nagad
+          </option>
+
+          <option value="Bank Transfer">
+            Bank Transfer
+          </option>
+
+        </select>
+
+      </div>
+
+
+      <div class="summary-card">
+
+        <div>
+
+          <span>
+            Price
+          </span>
+
+          <strong>
+            ৳ 0.00 / USDT
+          </strong>
+
+        </div>
+
+
+        <div>
+
+          <span>
+            Amount
+          </span>
+
+          <strong id="summaryAmount">
+            0 USDT
+          </strong>
+
+        </div>
+
+
+        <div>
+
+          <span>
+            Payment
+          </span>
+
+          <strong id="summaryPayment">
+            Not selected
+          </strong>
+
+        </div>
+
+      </div>
+
+
+      <button
+        class="primary-btn full"
+        id="createOrderBtn"
+      >
+        Create Order
       </button>
 
-      <button class="nav-item" type="button">
-        <span>▣</span>
-        <small>Orders</small>
-      </button>
+    </section>
 
-      <button class="nav-item" type="button">
-        <span>◉</span>
-        <small>Profile</small>
-      </button>
 
-    </nav>
 
-  </div>
+    <!-- ORDERS -->
 
-  <script src="app.js"></script>
+    <section id="ordersPage" class="page">
+
+      <h1>
+        My Orders
+      </h1>
+
+      <p class="subtitle">
+        Your P2P transactions
+      </p>
+
+      <div id="ordersList">
+
+        <div class="empty">
+
+          <div class="empty-icon">
+            📋
+          </div>
+
+          <strong>
+            No orders yet
+          </strong>
+
+          <p>
+            Your orders will appear here.
+          </p>
+
+        </div>
+
+      </div>
+
+    </section>
+
+
+
+    <!-- PROFILE -->
+
+    <section id="profilePage" class="page">
+
+      <div class="profile-card">
+
+        <div class="profile-avatar">
+          U
+        </div>
+
+        <h2>
+          Guest User
+        </h2>
+
+        <p>
+          Telegram account
+        </p>
+
+      </div>
+
+
+      <div class="profile-menu">
+
+        <div>
+          👤 Account
+        </div>
+
+        <div>
+          💳 Payment Methods
+        </div>
+
+        <div>
+          🔐 Security
+        </div>
+
+        <div>
+          ⚙️ Settings
+        </div>
+
+      </div>
+
+    </section>
+
+  </main>
+
+
+
+  <!-- Bottom Navigation -->
+
+  <nav class="bottom-nav">
+
+    <button
+      class="nav-item active"
+      data-page="homePage"
+    >
+      <span>⌂</span>
+      <small>Home</small>
+    </button>
+
+
+    <button
+      class="nav-item"
+      data-page="tradePage"
+    >
+      <span>⇄</span>
+      <small>Trade</small>
+    </button>
+
+
+    <button
+      class="nav-item"
+      data-page="ordersPage"
+    >
+      <span>▣</span>
+      <small>Orders</small>
+    </button>
+
+
+    <button
+      class="nav-item"
+      data-page="profilePage"
+    >
+      <span>◉</span>
+      <small>Profile</small>
+    </button>
+
+  </nav>
+
+</div>
+
+
+<script src="app.js"></script>
 
 </body>
 </html>
