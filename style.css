@@ -5,14 +5,14 @@
 }
 
 :root {
+  --dark: #0b1220;
+  --green: #16a34a;
+  --green-dark: #12813a;
   --bg: #f4f6f9;
   --card: #ffffff;
-  --dark: #0b1220;
   --text: #111827;
   --muted: #6b7280;
   --border: #e5e7eb;
-  --accent: #16a34a;
-  --accent-dark: #12813a;
 }
 
 body {
@@ -31,34 +31,33 @@ button {
   max-width: 520px;
   min-height: 100vh;
   margin: auto;
-  background: var(--bg);
-  padding-bottom: 82px;
+  padding-bottom: 80px;
 }
 
-/* Header */
+
+/* HEADER */
 
 .topbar {
   background: var(--dark);
   color: white;
   padding: 20px;
   display: flex;
-  align-items: center;
   justify-content: space-between;
+  align-items: center;
 }
 
 .brand {
   font-size: 24px;
   font-weight: 800;
-  letter-spacing: -0.5px;
 }
 
-.online {
+.status {
   margin-top: 5px;
   font-size: 12px;
-  color: #aab4c5;
+  color: #9ca8bb;
 }
 
-.online span {
+.status span {
   display: inline-block;
   width: 7px;
   height: 7px;
@@ -71,76 +70,82 @@ button {
   width: 42px;
   height: 42px;
   border: 1px solid #293449;
+  border-radius: 12px;
   background: #151e2e;
   color: white;
-  border-radius: 12px;
-  font-size: 17px;
 }
 
-/* Main */
 
-main {
+/* MAIN */
+
+.page {
+  display: none;
   padding: 16px;
 }
 
-/* Balance */
+.page.active {
+  display: block;
+}
+
+
+/* BALANCE */
 
 .balance-card {
   background: var(--dark);
   color: white;
-  border-radius: 18px;
   padding: 20px;
+  border-radius: 18px;
   margin-bottom: 14px;
 }
 
 .balance-label {
-  color: #9ca8bb;
   font-size: 13px;
+  color: #9ca8bb;
 }
 
 .balance-row {
+  margin-top: 8px;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-top: 8px;
 }
 
-.balance-amount {
+.balance {
   font-size: 31px;
   font-weight: 800;
 }
 
-.balance-currency {
-  color: #aab4c5;
+.currency {
+  color: #9ca8bb;
   font-size: 13px;
-  margin-top: 2px;
 }
 
 .wallet-btn {
+  border: none;
   background: white;
   color: var(--dark);
-  border: none;
-  padding: 10px 16px;
+  padding: 10px 15px;
   border-radius: 10px;
   font-weight: 700;
 }
 
-/* Trade */
+
+/* TRADE */
 
 .trade-card {
-  background: var(--card);
+  background: white;
   border: 1px solid var(--border);
   border-radius: 18px;
   padding: 15px;
-  margin-bottom: 22px;
+  margin-bottom: 23px;
 }
 
 .trade-tabs {
-  display: flex;
   background: #f1f3f6;
-  border-radius: 11px;
   padding: 4px;
-  margin-bottom: 16px;
+  border-radius: 11px;
+  display: flex;
+  margin-bottom: 15px;
 }
 
 .trade-tab {
@@ -155,8 +160,8 @@ main {
 
 .trade-tab.active {
   background: white;
-  color: var(--accent);
-  box-shadow: 0 2px 6px rgba(0,0,0,0.07);
+  color: var(--green);
+  box-shadow: 0 2px 6px rgba(0,0,0,.07);
 }
 
 .trade-info {
@@ -172,8 +177,8 @@ main {
 }
 
 .trade-info span {
-  font-size: 12px;
   color: var(--muted);
+  font-size: 12px;
 }
 
 .trade-info strong {
@@ -183,39 +188,36 @@ main {
 .primary-btn {
   width: 100%;
   border: none;
-  background: var(--accent);
+  background: var(--green);
   color: white;
   padding: 14px;
   border-radius: 11px;
-  font-size: 15px;
   font-weight: 800;
+  font-size: 15px;
 }
 
 .primary-btn:active {
-  background: var(--accent-dark);
+  background: var(--green-dark);
 }
 
-/* Market */
 
-.market-section {
-  margin-top: 4px;
-}
+/* SECTION */
 
-.section-header {
+.section-head {
   display: flex;
   justify-content: space-between;
   align-items: center;
   margin-bottom: 12px;
 }
 
-.section-header h2 {
+.section-head h2 {
   font-size: 18px;
 }
 
-.section-header p {
+.section-head p {
   margin-top: 4px;
-  font-size: 12px;
   color: var(--muted);
+  font-size: 12px;
 }
 
 .filter-btn {
@@ -224,10 +226,10 @@ main {
   padding: 8px 12px;
   border-radius: 9px;
   font-size: 12px;
-  font-weight: 700;
 }
 
-/* Offer */
+
+/* OFFER */
 
 .offer-card {
   background: white;
@@ -237,35 +239,26 @@ main {
   margin-bottom: 12px;
 }
 
-.merchant-row {
+.merchant {
   display: flex;
-  align-items: center;
   gap: 11px;
+  align-items: center;
 }
 
 .avatar {
   width: 42px;
   height: 42px;
-  background: #e8f7ed;
-  color: var(--accent);
   border-radius: 50%;
+  background: #e8f7ed;
+  color: var(--green);
   display: flex;
   justify-content: center;
   align-items: center;
   font-weight: 800;
 }
 
-.merchant-info {
-  display: flex;
-  flex-direction: column;
-  gap: 5px;
-}
-
-.merchant-info strong {
-  font-size: 14px;
-}
-
 .merchant-meta {
+  margin-top: 5px;
   display: flex;
   gap: 8px;
   font-size: 10px;
@@ -273,31 +266,31 @@ main {
 }
 
 .verified {
-  color: var(--accent);
+  color: var(--green);
   font-weight: 700;
 }
 
-.offer-details {
+.offer-info {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 10px;
   margin: 17px 0 12px;
 }
 
-.offer-details div {
+.offer-info div {
   background: #f7f8fa;
   padding: 11px;
   border-radius: 9px;
 }
 
-.offer-details span {
+.offer-info span {
   display: block;
   color: var(--muted);
   font-size: 10px;
   margin-bottom: 5px;
 }
 
-.offer-details strong {
+.offer-info strong {
   font-size: 14px;
 }
 
@@ -312,28 +305,29 @@ main {
   padding: 5px 8px;
   border-radius: 6px;
   font-size: 10px;
-  color: #4b5563;
 }
 
 .offer-btn {
   width: 100%;
   border: none;
-  background: var(--accent);
+  background: var(--green);
   color: white;
   padding: 12px;
   border-radius: 9px;
   font-weight: 800;
 }
 
-/* Empty */
 
-.empty-card {
+/* EMPTY */
+
+.empty {
   text-align: center;
   background: white;
   border: 1px dashed #d5d9e0;
   border-radius: 15px;
   padding: 28px 15px;
   color: var(--muted);
+  margin-top: 12px;
 }
 
 .empty-icon {
@@ -341,18 +335,158 @@ main {
   margin-bottom: 8px;
 }
 
-.empty-card strong {
+.empty strong {
   display: block;
   color: var(--text);
   font-size: 14px;
 }
 
-.empty-card p {
+.empty p {
   margin-top: 5px;
   font-size: 12px;
 }
 
-/* Bottom Navigation */
+
+/* TRADE PAGE */
+
+.back-btn {
+  border: none;
+  background: transparent;
+  font-size: 14px;
+  font-weight: 700;
+  padding: 5px 0 18px;
+}
+
+.page h1 {
+  font-size: 25px;
+}
+
+.subtitle {
+  color: var(--muted);
+  font-size: 13px;
+  margin: 5px 0 20px;
+}
+
+.input-card {
+  background: white;
+  border: 1px solid var(--border);
+  border-radius: 15px;
+  padding: 16px;
+  margin-bottom: 12px;
+}
+
+.input-card label {
+  display: block;
+  color: var(--muted);
+  font-size: 12px;
+  margin-bottom: 9px;
+}
+
+.amount-box {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.amount-box input {
+  width: 100%;
+  border: none;
+  outline: none;
+  font-size: 22px;
+  font-weight: 700;
+}
+
+.amount-box span {
+  font-weight: 700;
+}
+
+.input-card select {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid var(--border);
+  border-radius: 9px;
+  background: white;
+}
+
+.summary-card {
+  background: var(--dark);
+  color: white;
+  padding: 17px;
+  border-radius: 15px;
+  margin: 18px 0;
+}
+
+.summary-card div {
+  display: flex;
+  justify-content: space-between;
+  padding: 9px 0;
+  border-bottom: 1px solid #263043;
+}
+
+.summary-card div:last-child {
+  border-bottom: none;
+}
+
+.summary-card span {
+  color: #9ca8bb;
+  font-size: 12px;
+}
+
+.summary-card strong {
+  font-size: 12px;
+}
+
+
+/* PROFILE */
+
+.profile-card {
+  text-align: center;
+  background: white;
+  padding: 28px;
+  border-radius: 18px;
+  border: 1px solid var(--border);
+}
+
+.profile-avatar {
+  width: 65px;
+  height: 65px;
+  border-radius: 50%;
+  background: var(--dark);
+  color: white;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: auto auto 12px;
+  font-size: 25px;
+  font-weight: 800;
+}
+
+.profile-card p {
+  color: var(--muted);
+  font-size: 13px;
+  margin-top: 5px;
+}
+
+.profile-menu {
+  background: white;
+  border: 1px solid var(--border);
+  border-radius: 15px;
+  margin-top: 12px;
+  overflow: hidden;
+}
+
+.profile-menu div {
+  padding: 17px;
+  border-bottom: 1px solid var(--border);
+  font-size: 14px;
+}
+
+.profile-menu div:last-child {
+  border-bottom: none;
+}
+
+
+/* BOTTOM NAV */
 
 .bottom-nav {
   position: fixed;
@@ -365,8 +499,8 @@ main {
   background: white;
   border-top: 1px solid var(--border);
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  z-index: 10;
+  grid-template-columns: repeat(4,1fr);
+  z-index: 100;
 }
 
 .nav-item {
@@ -375,8 +509,8 @@ main {
   color: #8b93a1;
   display: flex;
   flex-direction: column;
-  align-items: center;
   justify-content: center;
+  align-items: center;
   gap: 4px;
 }
 
@@ -389,6 +523,5 @@ main {
 }
 
 .nav-item.active {
-  color: var(--accent);
-  font-weight: 800;
+  color: var(--green);
 }
