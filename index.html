@@ -3,13 +3,10 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#0b1220">
 
   <title>PayP2P</title>
-
-  <meta
-    name="description"
-    content="PayP2P - Simple and secure P2P marketplace"
-  >
+  <meta name="description" content="PayP2P - Secure P2P marketplace">
 
   <link rel="stylesheet" href="style.css">
 </head>
@@ -18,64 +15,161 @@
 
   <div class="app">
 
-    <header>
-      <div class="logo">PayP2P</div>
-      <div class="subtitle">Simple P2P marketplace</div>
+    <!-- Header -->
+    <header class="topbar">
+      <div>
+        <div class="brand">PayP2P</div>
+        <div class="online">
+          <span></span> P2P Marketplace
+        </div>
+      </div>
+
+      <button class="icon-btn" id="notificationBtn" type="button">
+        🔔
+      </button>
     </header>
 
     <main>
 
-      <section class="balance">
-        <div class="balance-title">
-          Available Balance
-        </div>
+      <!-- Balance -->
+      <section class="balance-card">
+        <div class="balance-label">Available Balance</div>
 
-        <div class="balance-amount">
-          0.00 USDT
+        <div class="balance-row">
+          <div>
+            <div class="balance-amount">0.00</div>
+            <div class="balance-currency">USDT</div>
+          </div>
+
+          <button class="wallet-btn" type="button">
+            Wallet
+          </button>
         </div>
       </section>
 
-      <section class="actions">
+      <!-- Buy / Sell -->
+      <section class="trade-card">
 
-        <button class="btn buy" type="button">
+        <div class="trade-tabs">
+          <button class="trade-tab active" id="buyTab" type="button">
+            Buy
+          </button>
+
+          <button class="trade-tab" id="sellTab" type="button">
+            Sell
+          </button>
+        </div>
+
+        <div class="trade-info">
+          <div>
+            <span>Asset</span>
+            <strong>USDT</strong>
+          </div>
+
+          <div>
+            <span>Payment</span>
+            <strong>BDT ৳</strong>
+          </div>
+        </div>
+
+        <button class="primary-btn" id="tradeBtn" type="button">
           Buy USDT
         </button>
 
-        <button class="btn sell" type="button">
-          Sell USDT
-        </button>
-
       </section>
 
-      <section>
+      <!-- Market -->
+      <section class="market-section">
 
-        <div class="section-title">
-          Quick Access
+        <div class="section-header">
+          <div>
+            <h2>Available Offers</h2>
+            <p>Live P2P advertisements</p>
+          </div>
+
+          <button class="filter-btn" type="button">
+            Filter
+          </button>
         </div>
 
-        <div class="menu">
+        <!-- Offer -->
+        <div class="offer-card">
 
-          <div class="menu-item">
-            📋 My Orders
+          <div class="merchant-row">
+
+            <div class="avatar">P</div>
+
+            <div class="merchant-info">
+              <strong>PayP2P Merchant</strong>
+
+              <div class="merchant-meta">
+                <span class="verified">✓ Verified</span>
+                <span>100% completion</span>
+              </div>
+            </div>
+
           </div>
 
-          <div class="menu-item">
-            👤 Profile
+          <div class="offer-details">
+
+            <div>
+              <span>Price</span>
+              <strong>৳ 0.00</strong>
+            </div>
+
+            <div>
+              <span>Available</span>
+              <strong>0 USDT</strong>
+            </div>
+
           </div>
 
-          <div class="menu-item">
-            💳 Payment Methods
+          <div class="payment-tags">
+            <span>bKash</span>
+            <span>Nagad</span>
           </div>
 
+          <button class="offer-btn" type="button">
+            Buy USDT
+          </button>
+
+        </div>
+
+        <!-- Empty state -->
+        <div class="empty-card">
+          <div class="empty-icon">↔</div>
+          <strong>No other offers yet</strong>
+          <p>New P2P offers will appear here.</p>
         </div>
 
       </section>
 
     </main>
 
-    <footer>
-      PayP2P © 2026
-    </footer>
+    <!-- Bottom Navigation -->
+    <nav class="bottom-nav">
+
+      <button class="nav-item active" type="button">
+        <span>⌂</span>
+        <small>Home</small>
+      </button>
+
+      <button class="nav-item" type="button">
+        <span>⇄</span>
+        <small>Trade</small>
+      </button>
+
+      <button class="nav-item" type="button">
+        <span>▣</span>
+        <small>Orders</small>
+      </button>
+
+      <button class="nav-item" type="button">
+        <span>◉</span>
+        <small>Profile</small>
+      </button>
+
+    </nav>
 
   </div>
 
@@ -83,7 +177,3 @@
 
 </body>
 </html>
-
-তারপর Commit changes চাপো। ✅
-
-"app.js"-ও যদি ইতিমধ্যে তৈরি করে থাকো, আর কিছু পরিবর্তন করতে হবে না।
